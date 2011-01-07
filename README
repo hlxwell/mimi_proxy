@@ -1,0 +1,6 @@
+======= MIMI Proxy README ========
+
+1. set your server login url in mimi_proxy file.
+2. run "mimi_proxy start" to turn on proxy.
+3. view view facebook or twitter. (The tragedy of us.)
+4. run "mimi_proxy stop" to turn off proxy.
