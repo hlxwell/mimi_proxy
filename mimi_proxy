@@ -1,0 +1,24 @@
+#!/bin/sh -e
+
+COMMAND="$1"
+SERVER="" # ENTER YOUR SSH SERVER NAME LIKE LOGIN_NAME@SERVER_URL
+
+case $COMMAND in
+start)
+  networksetup -setsocksfirewallproxy AirPort 127.0.0.1 8888
+  ssh -q -N -f -D 8888 $SERVER
+  echo "You computer is using proxy now!"
+  ;;
+stop)
+  networksetup -setsocksfirewallproxystate AirPort off
+  ps aux|grep "ssh -D"|awk '{ cmd = "kill -9 " ($2); system(cmd) }'
+  echo "You computer stopped using proxy now!"
+  ;;
+*)
+  echo "Please provide command name"
+  echo
+  echo "Usage:"
+  echo "  mimi_proxy start"
+  echo "  mimi_proxy stop"
+  exit 1
+esac
