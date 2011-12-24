@@ -4,7 +4,7 @@ COMMAND="$1"
 SERVER="" # ENTER YOUR SSH SERVER NAME LIKE LOGIN_NAME@SERVER_URL
 
 case $COMMAND in
-start)
+start_sock)
   networksetup -setsocksfirewallproxy AirPort 127.0.0.1 8888
   networksetup -setsocksfirewallproxy Ethernet 127.0.0.1 8888
 
@@ -15,9 +15,40 @@ start)
   fi
   echo "You computer is using proxy now!"
   ;;
-stop)
+start_pac)
+  networksetup -setautoproxyurl AirPort file://localhost/Users/michaelhe/projects/myProject/mimi_proxy/rule-list/rule.pac
+  networksetup -setautoproxyurl Ethernet file://localhost/Users/michaelhe/projects/myProject/mimi_proxy/rule-list/rule.pac
+
+  if ps aux|grep "ssh -q -N -f -D 8888"|grep -v grep; then
+    echo "Using exist ssh connection."
+  else
+    ssh -q -N -f -D 8888 $SERVER
+  fi
+  echo "You computer is using proxy now!"
+  ;;
+
+switch_to_sock)
+  networksetup -setautoproxystate AirPort off
+  networksetup -setautoproxystate Ethernet off
+
+  networksetup -setsocksfirewallproxy AirPort 127.0.0.1 8888
+  networksetup -setsocksfirewallproxy Ethernet 127.0.0.1 8888
+  ;;
+
+switch_to_pac)
   networksetup -setsocksfirewallproxystate AirPort off
   networksetup -setsocksfirewallproxystate Ethernet off
+
+  networksetup -setautoproxyurl AirPort file://localhost/Users/michaelhe/projects/myProject/mimi_proxy/rule-list/rule.pac
+  networksetup -setautoproxyurl Ethernet file://localhost/Users/michaelhe/projects/myProject/mimi_proxy/rule-list/rule.pac
+  ;;
+
+stop)
+  networksetup -setautoproxystate AirPort off
+  networksetup -setautoproxystate Ethernet off
+  networksetup -setsocksfirewallproxystate AirPort off
+  networksetup -setsocksfirewallproxystate Ethernet off
+
   ps aux|grep "ssh -q -N -f -D 8888"|grep -v grep|awk '{ cmd = "kill -9 " ($2); system(cmd) }'
   echo "You computer stopped using proxy now!"
   ;;
@@ -25,7 +56,8 @@ stop)
   echo "Please provide command name"
   echo
   echo "Usage:"
-  echo "  mimi_proxy start"
+  echo "  mimi_proxy start_sock | start_pac"
+  echo "  mimi_proxy switch_to_sock | switch_to_pac"
   echo "  mimi_proxy stop"
   exit 1
 esac
