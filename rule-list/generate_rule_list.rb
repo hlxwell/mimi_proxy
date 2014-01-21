@@ -25,12 +25,13 @@ puts 'done pac generation'
 
 __END__
 function regExpMatch(url, pattern) {
-	try { return new RegExp(pattern).test(url); } catch(ex) { return false; }
+  try { return new RegExp(pattern).test(url); } catch(ex) { return false; }
 }
 
 var p1 = 'SOCKS5 localhost:8888';
 
 function FindProxyForURL(url, host) {
   if (shExpMatch(url, 'encrypted.google.com/*')) return 'DIRECT';
-	if (shExpMatch(url, '*.google.com.hk/*')) return 'DIRECT';
-	if (shExpMatch(url, '*.cn/*')) return 'DIRECT';
+  if (shExpMatch(url, '*.google.com.hk/*')) return 'DIRECT';
+  if (shExpMatch(url, '*.cn/*')) return 'DIRECT';
+}

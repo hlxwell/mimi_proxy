@@ -1,11 +1,14 @@
 #!/bin/sh -e
 
 COMMAND="$1"
-SERVER="" # ENTER YOUR SSH SERVER NAME LIKE LOGIN_NAME@SERVER_URL
+# ENTER YOUR SSH SERVER NAME LIKE LOGIN_NAME@SERVER_URL
+SERVER=""
 
 case $COMMAND in
 start_sock)
-  networksetup -setsocksfirewallproxy AirPort 127.0.0.1 8888
+  networksetup -setsocksfirewallproxystate Wi-Fi on
+  networksetup -setsocksfirewallproxystate Ethernet on
+  networksetup -setsocksfirewallproxy Wi-Fi 127.0.0.1 8888
   networksetup -setsocksfirewallproxy Ethernet 127.0.0.1 8888
 
   if ps aux|grep "ssh -q -N -f -D 8888"|grep -v grep; then
@@ -15,8 +18,11 @@ start_sock)
   fi
   echo "You computer is using proxy now!"
   ;;
+
 start_pac)
-  networksetup -setautoproxyurl AirPort file://localhost/Users/michaelhe/projects/myProject/mimi_proxy/rule-list/rule.pac
+  networksetup -setautoproxystate Wi-Fi on
+  networksetup -setautoproxystate Ethernet on
+  networksetup -setautoproxyurl Wi-Fi file://localhost/Users/michaelhe/projects/myProject/mimi_proxy/rule-list/rule.pac
   networksetup -setautoproxyurl Ethernet file://localhost/Users/michaelhe/projects/myProject/mimi_proxy/rule-list/rule.pac
 
   if ps aux|grep "ssh -q -N -f -D 8888"|grep -v grep; then
@@ -28,25 +34,25 @@ start_pac)
   ;;
 
 switch_to_sock)
-  networksetup -setautoproxystate AirPort off
+  networksetup -setautoproxystate Wi-Fi off
   networksetup -setautoproxystate Ethernet off
-
-  networksetup -setsocksfirewallproxy AirPort 127.0.0.1 8888
+  networksetup -setsocksfirewallproxy Wi-Fi 127.0.0.1 8888
   networksetup -setsocksfirewallproxy Ethernet 127.0.0.1 8888
+  echo "You computer stopped using proxy now!"
   ;;
 
 switch_to_pac)
-  networksetup -setsocksfirewallproxystate AirPort off
+  networksetup -setsocksfirewallproxystate Wi-Fi off
   networksetup -setsocksfirewallproxystate Ethernet off
-
-  networksetup -setautoproxyurl AirPort file://localhost/Users/michaelhe/projects/myProject/mimi_proxy/rule-list/rule.pac
+  networksetup -setautoproxyurl Wi-Fi file://localhost/Users/michaelhe/projects/myProject/mimi_proxy/rule-list/rule.pac
   networksetup -setautoproxyurl Ethernet file://localhost/Users/michaelhe/projects/myProject/mimi_proxy/rule-list/rule.pac
+  echo "You computer stopped using proxy now!"
   ;;
 
 stop)
-  networksetup -setautoproxystate AirPort off
+  networksetup -setautoproxystate Wi-Fi off
   networksetup -setautoproxystate Ethernet off
-  networksetup -setsocksfirewallproxystate AirPort off
+  networksetup -setsocksfirewallproxystate Wi-Fi off
   networksetup -setsocksfirewallproxystate Ethernet off
 
   ps aux|grep "ssh -q -N -f -D 8888"|grep -v grep|awk '{ cmd = "kill -9 " ($2); system(cmd) }'
